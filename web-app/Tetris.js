@@ -583,14 +583,21 @@ Tetris.next_turn = function (game) {
     // So lock the current piece in place and deploy the next.
     const locked_field = lock(game);
 
-    const cleared_field = clear_lines(locked_field);
+    // Count the number of lines ready to be cleared
+    const linesCleared = clear_lines(locked_field).length;
+
+    // Calculate the new score based on the cleared lines
+    const newScore = Score.cleared_lines(linesCleared, game.score);
+
+    // Update the game score
+    game.score = newScore;
 
     const [next_tetromino, bag] = game.bag();
 
     return {
         "bag": bag,
         "current_tetromino": game.next_tetromino,
-        "field": cleared_field,
+        "field": locked_field,
         "game_over": false,
         "next_tetromino": next_tetromino,
         "position": starting_position,

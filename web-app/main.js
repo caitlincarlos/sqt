@@ -71,7 +71,15 @@ const update_grid = function () {
         }
     );
 
-    // Add code below to display the score information.
+    // Add code to display the score information.
+    const currentScoreElement = document.getElementById("current-score");
+    const linesClearedElement = document.getElementById("lines-cleared");
+    const currentLevelElement = document.getElementById("current-level");
+
+    // Update the HTML elements with data from the Score object.
+    currentScoreElement.textContent = game.score.score;
+    linesClearedElement.textContent = game.score.lines_cleared;
+    currentLevelElement.textContent = Score.level(game.score);
 
 };
 
