@@ -71,7 +71,7 @@ describe("Score", function () {
             let game = example_game;
             // Slot a T tetromino into the hole and drop.
             // This can only go one deep.
-            game.current_tetromino = Tetris.Z_tetromino;
+            game.current_tetromino = Tetris.T_tetromino;
 
             // I could use hard_drop here, but that would also score.
             // Instead wait for it to drop 22 times.
