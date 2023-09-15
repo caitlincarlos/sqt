@@ -29,7 +29,7 @@
 <nav >
     
     
-    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="Score.html">Score</a><ul class='methods'><li data-type='method'><a href="Score.html#.new_score">new_score</a></li></ul></li><li><a href="Tetris.html">Tetris</a><ul class='methods'><li data-type='method'><a href="Tetris.html#.hard_drop">hard_drop</a></li><li data-type='method'><a href="Tetris.html#.is_game_over">is_game_over</a></li><li data-type='method'><a href="Tetris.html#.left">left</a></li><li data-type='method'><a href="Tetris.html#.new_game">new_game</a></li><li data-type='method'><a href="Tetris.html#.next_turn">next_turn</a></li><li data-type='method'><a href="Tetris.html#.right">right</a></li><li data-type='method'><a href="Tetris.html#.rotate_ccw">rotate_ccw</a></li><li data-type='method'><a href="Tetris.html#.rotate_cw">rotate_cw</a></li><li data-type='method'><a href="Tetris.html#.soft_drop">soft_drop</a></li><li data-type='method'><a href="Tetris.html#.tetromino_coordiates">tetromino_coordiates</a></li></ul></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="Score.html">Score</a><ul class='methods'><li data-type='method'><a href="Score.html#.cleared_lines">cleared_lines</a></li><li data-type='method'><a href="Score.html#.level">level</a></li><li data-type='method'><a href="Score.html#.new_score">new_score</a></li></ul></li><li><a href="Tetris.html">Tetris</a><ul class='methods'><li data-type='method'><a href="Tetris.html#.hard_drop">hard_drop</a></li><li data-type='method'><a href="Tetris.html#.is_game_over">is_game_over</a></li><li data-type='method'><a href="Tetris.html#.left">left</a></li><li data-type='method'><a href="Tetris.html#.new_game">new_game</a></li><li data-type='method'><a href="Tetris.html#.next_turn">next_turn</a></li><li data-type='method'><a href="Tetris.html#.right">right</a></li><li data-type='method'><a href="Tetris.html#.rotate_ccw">rotate_ccw</a></li><li data-type='method'><a href="Tetris.html#.rotate_cw">rotate_cw</a></li><li data-type='method'><a href="Tetris.html#.soft_drop">soft_drop</a></li><li data-type='method'><a href="Tetris.html#.tetromino_coordiates">tetromino_coordiates</a></li></ul></li></ul>
     
 </nav>
 
@@ -55,9 +55,12 @@ const Score = {};
 
 /**
  * The score object contains information about the score of the game.
- * Currently it is implemented as a single number,
- * but could include other information such as the number of lines cleared.
- * @typedef {number} Score
+ * It includes the score, the number of lines cleared,
+ * whether the last line cleared was a Tetris, and a log message.
+ * @typedef {Object} Score.Score
+ * @property {number} score - The current score.
+ * @property {number} lines_cleared - The number of lines cleared.
+ * @property {boolean} lastLineWasTetris - Indicates if the last line cleared was a Tetris.
  * @memberof Score
  */
 
@@ -65,14 +68,86 @@ const Score = {};
  * Returns a game state for a new Tetris Game.
  * @function
  * @memberof Score
- * @returns {Score.Score} The new game.
+ * @returns {Score.Score} The new game state object.
  */
 Score.new_score = function () {
-    return 0;
+    return {
+        score: 0,
+        lines_cleared: 0,
+        lastLineWasTetris: false,
+    };
 };
 
-export default Object.freeze(Score);
-</code></pre>
+/**
+ * Calculates and returns the current level based on the lines cleared.
+ * You start at level 1 and advance a level every 10 lines cleared.
+ * @function
+ * @memberof Score
+ * @param {Score.Score} scoreObj - The game state object containing lines_cleared.
+ * @returns {number} The current level.
+ */
+Score.level = function (scoreObj) {
+    return Math.floor(scoreObj.lines_cleared / 10) + 1;
+};
+
+/**
+ * Adds the cleared lines and updates the score based on the number of lines cleared,
+ * considering the scoring rules for different line clears.
+ * @function
+ * @memberof Score
+ * @param {number} linesCleared - The number of lines cleared in the current move.
+ * @param {Score.Score} scoreObj - The game state object containing score and lines_cleared.
+ * @returns {Score.Score} The updated game state object.
+ */
+Score.cleared_lines = function (linesCleared, scoreObj) {
+    const level = Score.level(scoreObj);
+
+    // Calculate the score increment based on the number of lines cleared.
+    let scoreIncrement = 0;
+
+    if (linesCleared === 1) {
+        scoreIncrement = 100 * level;
+    } else if (linesCleared === 2) {
+        scoreIncrement = 300 * level;
+    } else if (linesCleared === 3) {
+        scoreIncrement = 500 * level;
+    } else if (linesCleared === 4) {
+        scoreIncrement = 800 * level;
+    }
+
+    // Check if this line clear was a Tetris.
+    const isTetris = linesCleared === 4;
+
+    // Check if this line clear is a back-to-back Tetris.
+    const isBackToBackTetris = isTetris &amp;&amp; scoreObj.lastLineWasTetris;
+
+    // Calculate the total score.
+    let totalScore = scoreObj.score + scoreIncrement;
+
+    // If it's a back-to-back Tetris, add an additional bonus.
+    if (isBackToBackTetris) {
+        totalScore += 400 * level;
+        scoreObj.lastLineWasTetris = true;
+    } else {
+        scoreObj.lastLineWasTetris = isTetris;
+    }
+
+    // Update the game state object.
+    scoreObj.score = totalScore;
+    scoreObj.lines_cleared += linesCleared;
+
+    return scoreObj;
+};
+
+Score.add_points = function (scoreObj, points) {
+    const newScoreObj = Object.assign({}, scoreObj);
+    newScoreObj.score += points;
+    return newScoreObj;
+};
+
+
+
+export default Object.freeze(Score);</code></pre>
         </article>
     </section>
 
@@ -86,7 +161,7 @@ export default Object.freeze(Score);
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.2</a> on Fri Jul 28 2023 13:54:55 GMT+0100 (British Summer Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.2</a> on Fri Sep 15 2023 15:21:40 GMT+0100 (British Summer Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>

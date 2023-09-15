@@ -29,7 +29,7 @@
 <nav >
     
     
-    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="Score.html">Score</a><ul class='methods'><li data-type='method'><a href="Score.html#.new_score">new_score</a></li></ul></li><li><a href="Tetris.html">Tetris</a><ul class='methods'><li data-type='method'><a href="Tetris.html#.hard_drop">hard_drop</a></li><li data-type='method'><a href="Tetris.html#.is_game_over">is_game_over</a></li><li data-type='method'><a href="Tetris.html#.left">left</a></li><li data-type='method'><a href="Tetris.html#.new_game">new_game</a></li><li data-type='method'><a href="Tetris.html#.next_turn">next_turn</a></li><li data-type='method'><a href="Tetris.html#.right">right</a></li><li data-type='method'><a href="Tetris.html#.rotate_ccw">rotate_ccw</a></li><li data-type='method'><a href="Tetris.html#.rotate_cw">rotate_cw</a></li><li data-type='method'><a href="Tetris.html#.soft_drop">soft_drop</a></li><li data-type='method'><a href="Tetris.html#.tetromino_coordiates">tetromino_coordiates</a></li></ul></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="Score.html">Score</a><ul class='methods'><li data-type='method'><a href="Score.html#.cleared_lines">cleared_lines</a></li><li data-type='method'><a href="Score.html#.level">level</a></li><li data-type='method'><a href="Score.html#.new_score">new_score</a></li></ul></li><li><a href="Tetris.html">Tetris</a><ul class='methods'><li data-type='method'><a href="Tetris.html#.hard_drop">hard_drop</a></li><li data-type='method'><a href="Tetris.html#.is_game_over">is_game_over</a></li><li data-type='method'><a href="Tetris.html#.left">left</a></li><li data-type='method'><a href="Tetris.html#.new_game">new_game</a></li><li data-type='method'><a href="Tetris.html#.next_turn">next_turn</a></li><li data-type='method'><a href="Tetris.html#.right">right</a></li><li data-type='method'><a href="Tetris.html#.rotate_ccw">rotate_ccw</a></li><li data-type='method'><a href="Tetris.html#.rotate_cw">rotate_cw</a></li><li data-type='method'><a href="Tetris.html#.soft_drop">soft_drop</a></li><li data-type='method'><a href="Tetris.html#.tetromino_coordiates">tetromino_coordiates</a></li></ul></li></ul>
     
 </nav>
 
@@ -518,12 +518,14 @@ Tetris.rotate_ccw = function (game) {
     return R.mergeRight(game, {"current_tetromino": new_rotation});
 };
 
-const descend = function (game) {
+const descend = function (game, points = 0) {
     const new_position = [game.position[0], game.position[1] + 1];
     if (is_blocked(game.field, game.current_tetromino, new_position)) {
         return game;
     }
-    return R.mergeRight(game, {"position": new_position});
+    // Update the score with the given points.
+    const updatedScore = Score.add_points(game.score, points);
+    return R.mergeRight(game, {"position": new_position, "score": updatedScore});
 };
 
 /**
@@ -539,7 +541,8 @@ Tetris.soft_drop = function (game) {
     if (Tetris.is_game_over(game)) {
         return game;
     }
-    return descend(game);
+    // Score 1 point for soft drop.
+    return descend(game, 1);
 };
 
 /**
@@ -556,7 +559,7 @@ Tetris.hard_drop = function (game) {
     if (Tetris.is_game_over(game)) {
         return game;
     }
-    const dropped_once = descend(game);
+    const dropped_once = descend(game, 2);
     if (R.equals(game, dropped_once)) {
         return Tetris.next_turn(game);
     }
@@ -613,7 +616,7 @@ Tetris.next_turn = function (game) {
         return descended;
     }
 
-    // Is the current piece on top of a locked in piece?
+    // Is the current piece on top of a locked-in piece?
     // I.e. it's just been deployed and something is in the way.
     // In this case, lose the game.
     if (is_blocked_by_geometry(
@@ -624,14 +627,21 @@ Tetris.next_turn = function (game) {
         return lose(game);
     }
 
-    // Otherwise, we can't descend and we've not lost,
+    // Otherwise, we can't descend, and we've not lost,
     // So lock the current piece in place and deploy the next.
     const locked_field = lock(game);
+
+    // Count the number of lines ready to be cleared.
+    const linesToClear = R.count(is_complete_line, locked_field);
+
+    // Call Score.cleared_lines with the number of lines to update the score.
+    const updatedScore = Score.cleared_lines(linesToClear, game.score);
 
     const cleared_field = clear_lines(locked_field);
 
     const [next_tetromino, bag] = game.bag();
 
+    // Update the game object with the new score.
     return {
         "bag": bag,
         "current_tetromino": game.next_tetromino,
@@ -639,9 +649,10 @@ Tetris.next_turn = function (game) {
         "game_over": false,
         "next_tetromino": next_tetromino,
         "position": starting_position,
-        "score": game.score
+        "score": updatedScore, // Updated score
     };
 };
+
 
 /**
  * @function
@@ -653,8 +664,7 @@ Tetris.is_game_over = function (game) {
     return game.game_over;
 };
 
-export default Object.freeze(Tetris);
-</code></pre>
+export default Object.freeze(Tetris);</code></pre>
         </article>
     </section>
 
@@ -668,7 +678,7 @@ export default Object.freeze(Tetris);
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.2</a> on Fri Jul 28 2023 13:54:55 GMT+0100 (British Summer Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.2</a> on Fri Sep 15 2023 15:21:40 GMT+0100 (British Summer Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>

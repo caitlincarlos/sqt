@@ -131,6 +131,7 @@ const timer_function = function () {
 };
 
 // Start the game with an initial timeout
+// From here on the timer_function above is called.
 setTimeout(timer_function, 500);
 
 update_grid();

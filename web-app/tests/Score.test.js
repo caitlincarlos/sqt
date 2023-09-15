@@ -88,56 +88,112 @@ describe("Score", function () {
     it(
         `A double line clear scores 300 × level`,
         function () {
-            // Implement this function.
-            throw new Error("Unimplemented");
+            let game = example_game;
+            // Slot an O tetromino into the hole and drop.
+            game.current_tetromino = Tetris.O_tetromino;
+            game = Tetris.rotate_ccw(game);
+            game = Tetris.hard_drop(game);
+    
+            if (game.score.score !== 300) {
+                throw new Error("A double row clear should score 300");
+            }
         }
     );
 
     it(
         `A triple line clear scores 500 × level`,
         function () {
-            // Implement this function.
-            throw new Error("Unimplemented");
+            let game = example_game;
+            // Slot an S tetromino into the hole and drop.
+            game.current_tetromino = Tetris.S_tetromino;
+            game = Tetris.hard_drop(game);
+    
+            if (game.score.score !== 500) {
+                throw new Error("A triple row clear should score 500");
+            }
         }
     );
 
     it(
         `A tetris scores 800 × level`,
         function () {
-            // Implement this function.
-            throw new Error("Unimplemented");
+            let game = example_game;
+            // Slot a J tetromino into the hole and drop.
+            game.current_tetromino = Tetris.J_tetromino;
+            game = Tetris.hard_drop(game);
+    
+            if (game.score.score !== 800) {
+                throw new Error("A tetris should score 800");
+            }
         }
     );
 
     it(
         `Back to back tetrises score 1200 × level`,
         function () {
-            // Implement this function.
-            throw new Error("Unimplemented");
+            let game = example_game;
+            // Slot a L tetromino into the hole and drop.
+            game.current_tetromino = Tetris.L_tetromino;
+            game = Tetris.hard_drop(game);
+    
+            // Start a new game and slot another L tetromino into the hole.
+            game = Tetris.new_game();
+            game.current_tetromino = Tetris.L_tetromino;
+            game = Tetris.hard_drop(game);
+    
+            if (game.score.score !== 1200) {
+                throw new Error("Back-to-back tetrises should score 1200");
+            }
         }
     );
 
     it(
-        `A soft drop score 1 point per cell descended`,
+        `A soft drop scores 1 point per cell descended`,
         function () {
-            // Implement this function.
-            throw new Error("Unimplemented");
+            let game = example_game;
+            // Slot an I tetromino into the hole and perform a soft drop.
+            game.current_tetromino = Tetris.I_tetromino;
+            game = Tetris.soft_drop(game);
+    
+            // Calculate the expected score based on the number of cells descended.
+            const expectedScore = 1 * Tetris.field_height;
+    
+            if (game.score.score !== expectedScore) {
+                throw new Error("A soft drop should score 1 point per cell descended");
+            }
+        }
+    );
+    
+
+    it(
+        `A hard drop scores 2 points per cell descended`,
+        function () {
+            let game = example_game;
+            // Slot an S tetromino into the hole and perform a hard drop.
+            game.current_tetromino = Tetris.S_tetromino;
+            game = Tetris.hard_drop(game);
+    
+            // Calculate the expected score based on the number of cells descended.
+            const expectedScore = 2 * Tetris.field_height;
+    
+            if (game.score.score !== expectedScore) {
+                throw new Error("A hard drop should score 2 points per cell descended");
+            }
         }
     );
 
-    it(
-        `A hard drop score 2 point per cell descended`,
-        function () {
-            // Implement this function.
-            throw new Error("Unimplemented");
-        }
-    );
 
     it(
-        `Advancing the turn without manually dropping scores nothing.`,
+        `Advancing the turn without manually dropping scores nothing`,
         function () {
-            // Implement this function.
-            throw new Error("Unimplemented");
+            let game = example_game;
+
+            // Advance the turn without manually dropping.
+            game = Tetris.next_turn(game);
+
+            if (game.score.score !== 0) {
+                throw new Error("Advancing the turn without manually dropping should score nothing");
+            }
         }
     );
 });
