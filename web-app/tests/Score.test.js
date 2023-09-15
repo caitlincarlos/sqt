@@ -112,8 +112,12 @@ describe("Score", function () {
             let game = example_game;
             // Slot an S tetromino into the hole and drop.
             game.current_tetromino = Tetris.S_tetromino;
-            game = Tetris.hard_drop(game);
-    
+            
+                // Instead wait for it to drop 22 times.
+                R.range(0, 22).forEach(function () {
+                    game = Tetris.next_turn(game);
+                });
+
             if (game.score.score !== 500) {
                 throw new Error("A triple row clear should score 500");
             }
@@ -124,10 +128,14 @@ describe("Score", function () {
         `A tetris scores 800 × level`,
         function () {
             let game = example_game;
-            // Slot a J tetromino into the hole and drop.
-            game.current_tetromino = Tetris.J_tetromino;
-            game = Tetris.hard_drop(game);
-    
+            // Slot an I tetromino into the hole and drop.
+            game.current_tetromino = Tetris.I_tetromino;
+            game = Tetris.rotate_ccw(game);
+            
+            R.range(0, 22).forEach(function () {
+                game = Tetris.next_turn(game);
+            });
+
             if (game.score.score !== 800) {
                 throw new Error("A tetris should score 800");
             }
