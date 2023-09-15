@@ -92,4 +92,12 @@ Score.cleared_lines = function (linesCleared, scoreObj) {
     return scoreObj;
 };
 
+Score.add_points = function (scoreObj, points) {
+    const newScoreObj = Object.assign({}, scoreObj);
+    newScoreObj.score += points;
+    return newScoreObj;
+};
+
+
+
 export default Object.freeze(Score);
