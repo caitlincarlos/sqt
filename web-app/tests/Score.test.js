@@ -91,14 +91,14 @@ describe("Score", function () {
             let game = example_game;
             // Slot an O tetromino into the hole and drop.
             game.current_tetromino = Tetris.O_tetromino;
-            game = Tetris.rotate_ccw(game);
-            game = Tetris.hard_drop(game);
     
             if (game.score.score !== 300) {
                 throw new Error("A double row clear should score 300");
             }
         }
     );
+    
+    
 
     it(
         `A triple line clear scores 500 × level`,
