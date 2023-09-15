@@ -89,8 +89,14 @@ describe("Score", function () {
         `A double line clear scores 300 × level`,
         function () {
             let game = example_game;
-            // Slot an O tetromino into the hole and drop.
-            game.current_tetromino = Tetris.O_tetromino;
+            // Slot a J tetromino into the hole and drop.
+            game.current_tetromino = Tetris.J_tetromino;
+            game = Tetris.rotate_ccw(game);
+
+            // Instead wait for it to drop 22 times.
+            R.range(0, 22).forEach(function () {
+                game = Tetris.next_turn(game);
+            });
     
             if (game.score.score !== 300) {
                 throw new Error("A double row clear should score 300");
