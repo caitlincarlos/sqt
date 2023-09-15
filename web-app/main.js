@@ -116,13 +116,21 @@ document.body.onkeydown = function (event) {
 };
 
 const timer_function = function () {
+    // Calculate the current level
+    const currentLevel = Score.level(game.score);
+
+    // Calculate the time interval based on the level
+    const interval = 2500 / (currentLevel + 4);
+
+    // Update the game
     game = Tetris.next_turn(game);
     update_grid();
-    setTimeout(timer_function, 500);
+
+    // Set the next timer with the calculated interval
+    setTimeout(timer_function, interval);
 };
 
-// This first timeout starts the game. it's only called once.
-// From here on the timer_function above is called.
+// Start the game with an initial timeout
 setTimeout(timer_function, 500);
 
 update_grid();
