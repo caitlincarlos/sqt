@@ -1,14 +1,11 @@
-<!-- In HTML Comments are written like this -->
-<!-- They can all be removed for your apps -->
-
-<!doctype html> <!-- This first line tells browsers to expect modern standard html 5 -->
-<html lang="en-gb"> <!-- This is indicates the page is written in British English, useful for accessibility -->
+<!doctype html>
+<html lang="en-gb">
 <head>
-    <meta charset="utf-8"> <!-- This indicates how the file is encoded. utf-8 is standard -->
-    <title>Summer Tetris</title> <!-- All pages need a title, this will be displayed in the browser's title bar -->
-    <link rel="stylesheet" href="default.css"> <!-- Import style sheet – default.css -->
-    <link rel="icon" href="./assets/favicon.png"> <!-- Import 'Favorites Icon' – favicon.png -->
-    <script type="module" src="main.js"></script> <!-- Load the main script. Must be type="module". Have only one of these -->
+    <meta charset="utf-8">
+    <title>Summer Tetris</title>
+    <link rel="stylesheet" href="default.css">
+    <link rel="icon" href="./assets/favicon.png">
+    <script type="module" src="main.js"></script>
 </head>
 <body>
     <header>
@@ -17,20 +14,30 @@
     </header>
 
     <aside>
-        <!-- Display the current score, lines cleared, and current level -->
-        <p>Current Score: <span id="current-score">0</span></p>
-        <p>Lines Cleared: <span id="lines-cleared">0</span></p>
-        <p>Current Level: <span id="current-level">1</span></p>
+        <!-- Display the current score -->
+        <div id="score-info">
+            <strong>Score:</strong> <span id="current-score">0</span>
+        </div>
+
+        <!-- Display the number of lines cleared -->
+        <div id="lines-cleared-info">
+            <strong>Lines Cleared:</strong> <span id="lines-cleared">0</span>
+        </div>
+
+        <!-- Display the current level -->
+        <div id="level-info">
+            <strong>Level:</strong> <span id="current-level">1</span>
+        </div>
     </aside>
 
     <main>
         <div id="grid" class="grid">
-            <!-- Content for the main section can be added here -->
+            <!-- Content for the main element can be added here, including the Tetris game grid -->
         </div>
     </main>
 
     <footer id="footer">
-        <!-- Content for the footer can be added here -->
+        <!-- Content for the footer element can be added here -->
     </footer>
 </body>
 </html>

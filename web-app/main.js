@@ -11,6 +11,10 @@ document.documentElement.style.setProperty("--grid-rows", grid_rows);
 document.documentElement.style.setProperty("--grid-columns", grid_columns);
 
 const grid = document.getElementById("grid");
+const scoreElement = document.getElementById("current-score"); // Get the score element
+const linesClearedElement = document.getElementById("lines-cleared"); // Get the lines cleared element
+const levelElement = document.getElementById("current-level"); // Get the level element
+
 
 const cells = R.range(0, grid_rows).map(function () {
     const row = document.createElement("div");
@@ -71,17 +75,15 @@ const update_grid = function () {
         }
     );
 
-    // Add code to display the score information.
-    const currentScoreElement = document.getElementById("current-score");
-    const linesClearedElement = document.getElementById("lines-cleared");
-    const currentLevelElement = document.getElementById("current-level");
-
-    // Update the HTML elements with data from the Score object.
-    currentScoreElement.textContent = game.score.score;
+    // Read the score information from game.score and update the HTML elements
+    scoreElement.textContent = game.score.score;
     linesClearedElement.textContent = game.score.lines_cleared;
-    currentLevelElement.textContent = Score.level(game.score);
-
+    
+    // Calculate and update the level based on lines cleared
+    const currentLevel = Score.level(game.score);
+    levelElement.textContent = currentLevel;
 };
+
 
 // Don't allow the player to hold down the rotate key.
 let key_locked = false;
@@ -112,6 +114,7 @@ document.body.onkeydown = function (event) {
 
 const timer_function = function () {
     game = Tetris.next_turn(game);
+    
     update_grid();
     setTimeout(timer_function, 500);
 };
