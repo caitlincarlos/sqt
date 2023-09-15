@@ -1,18 +1,19 @@
 /**
  * @namespace Score
- * @author Caitlin Carlos
- * @version 2023
+ * @author A. Freddie Page
+ * @version 2022.23
  * This module provides the scoring system for a Tetris Game.
  */
 const Score = {};
 
 /**
- * The score object contains information about the score and lines cleared in the game.
- * @typedef {Object} ScoreObject
+ * The score object contains information about the score of the game.
+ * It includes the score, the number of lines cleared,
+ * whether the last line cleared was a Tetris, and a log message.
+ * @typedef {Object} Score.Score
  * @property {number} score - The current score.
  * @property {number} lines_cleared - The number of lines cleared.
- * @property {boolean} last_lines_cleared_tetris - Indicates if the last line cleared was a Tetris.
- * @property {number} level - The current game level.
+ * @property {boolean} lastLineWasTetris - Indicates if the last line cleared was a Tetris.
  * @memberof Score
  */
 
@@ -20,78 +21,75 @@ const Score = {};
  * Returns a game state for a new Tetris Game.
  * @function
  * @memberof Score
- * @returns {Score.ScoreObject} The new game state.
+ * @returns {Score.Score} The new game state object.
  */
 Score.new_score = function () {
     return {
         score: 0,
         lines_cleared: 0,
-        last_lines_cleared_tetris: false, // Initialize to false
-        level: 1,
+        lastLineWasTetris: false,
     };
 };
 
 /**
- * Calculates the game level based on the number of lines cleared in the input game state.
- *
+ * Calculates and returns the current level based on the lines cleared.
+ * You start at level 1 and advance a level every 10 lines cleared.
  * @function
  * @memberof Score
- * @param {Score} scoreObject - The game state containing score and lines cleared.
- * @returns {number} The game level based on the number of lines cleared.
- *   You start at level 1 and advance a level every 10 lines cleared.
+ * @param {Score.Score} scoreObj - The game state object containing lines_cleared.
+ * @returns {number} The current level.
  */
-Score.level = function (scoreObject) {
-    // Calculate the level based on the number of lines cleared.
-    // You start at level 1 and advance a level every 10 lines cleared.
-    const linesCleared = scoreObject.lines_cleared;
-    const level = Math.floor(linesCleared / 10) + 1;
-    return level;
+Score.level = function (scoreObj) {
+    return Math.floor(scoreObj.lines_cleared / 10) + 1;
 };
 
 /**
- * Calculates the points earned for clearing a certain number of lines based on the game's level.
+ * Adds the cleared lines and updates the score based on the number of lines cleared,
+ * considering the scoring rules for different line clears.
  * @function
  * @memberof Score
- * @param {Score.Score} score - The current game score object.
- * @param {number} linesCleared - The number of lines cleared in the current turn.
- * @returns {Score.Score} The updated game score object.
+ * @param {number} linesCleared - The number of lines cleared in the current move.
+ * @param {Score.Score} scoreObj - The game state object containing score and lines_cleared.
+ * @returns {Score.Score} The updated game state object.
  */
-Score.cleared_lines = function (score, linesCleared) {
-    const newScore = { ...score }; // Create a copy of the current score object
+Score.cleared_lines = function (linesCleared, scoreObj) {
+    const level = Score.level(scoreObj);
 
-    // Calculate points earned based on the number of lines cleared and the current level
-    let points = 0;
+    // Calculate the score increment based on the number of lines cleared.
+    let scoreIncrement = 0;
+
     if (linesCleared === 1) {
-        points = 100 * score.level;
+        scoreIncrement = 100 * level;
     } else if (linesCleared === 2) {
-        points = 300 * score.level;
+        scoreIncrement = 300 * level;
     } else if (linesCleared === 3) {
-        points = 500 * score.level;
+        scoreIncrement = 500 * level;
     } else if (linesCleared === 4) {
-        points = 800 * score.level;
-        newScore.last_lines_cleared_tetris = true; // Set to true for a Tetris
+        scoreIncrement = 800 * level;
+    }
+
+    // Check if this line clear was a Tetris.
+    const isTetris = linesCleared === 4;
+
+    // Check if this line clear is a back-to-back Tetris.
+    const isBackToBackTetris = isTetris && scoreObj.lastLineWasTetris;
+
+    // Calculate the total score.
+    let totalScore = scoreObj.score + scoreIncrement;
+
+    // If it's a back-to-back Tetris, add an additional bonus.
+    if (isBackToBackTetris) {
+        totalScore += 400 * level;
+        scoreObj.lastLineWasTetris = true;
     } else {
-        newScore.last_lines_cleared_tetris = false; // Reset to false for non-Tetris clears
+        scoreObj.lastLineWasTetris = isTetris;
     }
 
-    // Check if it's a back-to-back Tetris
-    if (linesCleared === 4 && score.last_lines_cleared === 4) {
-        points = 1200 * score.level;
-    }
+    // Update the game state object.
+    scoreObj.score = totalScore;
+    scoreObj.lines_cleared += linesCleared;
 
-    // Update the score and lines cleared in the newScore object
-    newScore.score += points;
-    newScore.lines_cleared += linesCleared;
-    newScore.last_lines_cleared = linesCleared; // Update the last_lines_cleared property
-    // Update the level based on the number of lines cleared
-    newScore.level = Score.level(newScore);
-
-
-    return newScore;
+    return scoreObj;
 };
 
-
 export default Object.freeze(Score);
-
-
-

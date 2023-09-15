@@ -556,8 +556,6 @@ const clear_lines = R.pipe(
  * @returns {Tetris.Game}
  */
 Tetris.next_turn = function (game) {
-    console.log(game);
-
     if (game.game_over) {
         return game;
     }
@@ -568,7 +566,7 @@ Tetris.next_turn = function (game) {
         return descended;
     }
 
-    // Is the current piece on top of a locked in piece?
+    // Is the current piece on top of a locked-in piece?
     // I.e. it's just been deployed and something is in the way.
     // In this case, lose the game.
     if (is_blocked_by_geometry(
@@ -579,14 +577,21 @@ Tetris.next_turn = function (game) {
         return lose(game);
     }
 
-    // Otherwise, we can't descend and we've not lost,
+    // Otherwise, we can't descend, and we've not lost,
     // So lock the current piece in place and deploy the next.
     const locked_field = lock(game);
+
+    // Count the number of lines ready to be cleared.
+    const linesToClear = R.count(is_complete_line, locked_field);
+
+    // Call Score.cleared_lines with the number of lines to update the score.
+    const updatedScore = Score.cleared_lines(linesToClear, game.score);
 
     const cleared_field = clear_lines(locked_field);
 
     const [next_tetromino, bag] = game.bag();
 
+    // Update the game object with the new score.
     return {
         "bag": bag,
         "current_tetromino": game.next_tetromino,
@@ -594,9 +599,10 @@ Tetris.next_turn = function (game) {
         "game_over": false,
         "next_tetromino": next_tetromino,
         "position": starting_position,
-        "score": game.score
+        "score": updatedScore, // Updated score
     };
 };
+
 
 /**
  * @function
