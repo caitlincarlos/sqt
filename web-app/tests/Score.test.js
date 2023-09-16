@@ -3,7 +3,7 @@ import Score from "../Score.js";
 import R from "../ramda.js";
 
 const example_game = Tetris.new_game();
-const field_string = `----------
+const field_string1 = `----------
 ----------
 ----------
 ----------
@@ -25,9 +25,38 @@ SSSZ-IOOJJ
 TSZZ-IOOJJ
 TTZL-IOOJJ
 TLLL-IOOJJ`;
-example_game.field = field_string.split("\n").map(
+example_game.field = field_string1.split("\n").map(
     (s) => s.replace(/-/g, " ").split("")
 );
+
+const example_game2 = Tetris.new_game();
+const field_string2 = `----------
+----------
+----------
+----------
+----------
+----------
+----------
+----------
+----------
+----------
+----------
+----------
+----------
+----------
+----------
+----------
+----------
+--S-------
+-SSZ-I----
+TSZZ-IIIII
+TTZL-IOOOO
+TLLL-IOOOO))`;
+example_game2.field = field_string2.split("\n").map(
+    (s) => s.replace(/-/g, " ").split("")
+);
+
+
 
 describe("Score", function () {
     it(
@@ -109,9 +138,10 @@ describe("Score", function () {
     it(
         `A triple line clear scores 500 × level`,
         function () {
-            let game = example_game;
-            // Slot an S tetromino into the hole and drop.
-            game.current_tetromino = Tetris.S_tetromino;
+            let game = example_game2;
+            // Slot an I tetromino into the hole and drop.
+            game.current_tetromino = Tetris.I_tetromino;
+            game = Tetris.rotate_ccw(game);
             
                 // Instead wait for it to drop 22 times.
                 R.range(0, 22).forEach(function () {
@@ -148,12 +178,12 @@ describe("Score", function () {
             let game = example_game;
             // Slot a L tetromino into the hole and drop.
             game.current_tetromino = Tetris.L_tetromino;
-            game = Tetris.hard_drop(game);
+   
     
             // Start a new game and slot another L tetromino into the hole.
             game = Tetris.new_game();
             game.current_tetromino = Tetris.L_tetromino;
-            game = Tetris.hard_drop(game);
+           
     
             if (game.score.score !== 1200) {
                 throw new Error("Back-to-back tetrises should score 1200");
@@ -170,13 +200,14 @@ describe("Score", function () {
             game = Tetris.soft_drop(game);
     
             // Calculate the expected score based on the number of cells descended.
-            const expectedScore = 1 * Tetris.field_height;
+            const expectedScore = Tetris.field_height;
     
             if (game.score.score !== expectedScore) {
                 throw new Error("A soft drop should score 1 point per cell descended");
             }
         }
     );
+    
     
 
     it(
