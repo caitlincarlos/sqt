@@ -56,7 +56,32 @@ example_game2.field = field_string2.split("\n").map(
     (s) => s.replace(/-/g, " ").split("")
 );
 
-
+const example_game3 = Tetris.new_game();
+const field_string3 = `----------
+----------
+----------
+----------
+----------
+----------
+----------
+----------
+----------
+----------
+----------
+----------
+----------
+----------
+LLLI-IIIII
+LOOI-IIIII
+TOOI-IIIII
+TTSI-IIIII
+TSSZ-IIIII
+TSZZ-IIIII
+TTZL-IOOOO
+TLLL-IOOOO))`;
+example_game3.field = field_string3.split("\n").map(
+    (s) => s.replace(/-/g, " ").split("")
+);
 
 describe("Score", function () {
     it(
@@ -175,21 +200,30 @@ describe("Score", function () {
     it(
         `Back to back tetrises score 1200 × level`,
         function () {
-            let game = example_game;
-            // Slot a L tetromino into the hole and drop.
-            game.current_tetromino = Tetris.L_tetromino;
-   
+            let game = example_game3;
+            // Slot two I tetrominos into the hole and drop.
+            game.current_tetromino = Tetris.I_tetromino;
     
-            // Start a new game and slot another L tetromino into the hole.
-            game = Tetris.new_game();
-            game.current_tetromino = Tetris.L_tetromino;
-           
+            // Rotate and drop the first I tetromino.
+            game = Tetris.rotate_ccw(game);
+
+            R.range(0, 22).forEach(function () {
+                game = Tetris.next_turn(game);
+            });
+    
+            game.current_tetromino = Tetris.I_tetromino;
+            game = Tetris.rotate_ccw(game);
+
+            R.range(0, 22).forEach(function () {
+                game = Tetris.next_turn(game);
+            });
     
             if (game.score.score !== 1200) {
                 throw new Error("Back-to-back tetrises should score 1200");
             }
         }
     );
+    
 
     it(
         `A soft drop scores 1 point per cell descended`,
@@ -199,8 +233,8 @@ describe("Score", function () {
             game.current_tetromino = Tetris.I_tetromino;
             game = Tetris.soft_drop(game);
     
-            // Calculate the expected score based on the number of cells descended.
-            const expectedScore = Tetris.field_height;
+            // The score should go up by one for each time a soft drop is performed.
+            const expectedScore = 1;
     
             if (game.score.score !== expectedScore) {
                 throw new Error("A soft drop should score 1 point per cell descended");
@@ -214,12 +248,13 @@ describe("Score", function () {
         `A hard drop scores 2 points per cell descended`,
         function () {
             let game = example_game;
-            // Slot an S tetromino into the hole and perform a hard drop.
-            game.current_tetromino = Tetris.S_tetromino;
+            // Slot an I tetromino into the hole and perform a hard drop.
+            game.current_tetromino = Tetris.I_tetromino;
             game = Tetris.hard_drop(game);
     
-            // Calculate the expected score based on the number of cells descended.
-            const expectedScore = 2 * Tetris.field_height;
+            // Calculate the expected score based on the number of cells descended. 
+            // In example_game the termino drops 17 cells till it stops
+            const expectedScore = 2 * 17;
     
             if (game.score.score !== expectedScore) {
                 throw new Error("A hard drop should score 2 points per cell descended");
