@@ -201,16 +201,7 @@ describe("Score", function () {
         `Back to back tetrises score 1200 × level`,
         function () {
             let game = example_game3;
-            // Slot two I tetrominos into the hole and drop.
-            game.current_tetromino = Tetris.I_tetromino;
-    
-            // Rotate and drop the first I tetromino.
-            game = Tetris.rotate_ccw(game);
-
-            R.range(0, 22).forEach(function () {
-                game = Tetris.next_turn(game);
-            });
-    
+            // Slot first I tetrominos into the hole and drop.
             game.current_tetromino = Tetris.I_tetromino;
             game = Tetris.rotate_ccw(game);
 
@@ -218,7 +209,18 @@ describe("Score", function () {
                 game = Tetris.next_turn(game);
             });
     
-            if (game.score.score !== 1200) {
+            // Slot second I tetrominos into the hole and drop.
+            game.current_tetromino = Tetris.I_tetromino;
+            game = Tetris.rotate_ccw(game);
+
+            R.range(0, 22).forEach(function () {
+                game = Tetris.next_turn(game);
+            });
+    
+            // Total should add to 2000 as 800 + 1200
+            // The first tetris will score 800, which we successfully tested for above
+            // So if this test passes successfully we know back to back tetrises score 1200
+            if (game.score.score !== 2000) {
                 throw new Error("Back-to-back tetrises should score 1200");
             }
         }
@@ -233,10 +235,8 @@ describe("Score", function () {
             game.current_tetromino = Tetris.I_tetromino;
             game = Tetris.soft_drop(game);
     
-            // The score should go up by one for each time a soft drop is performed.
-            const expectedScore = 1;
-    
-            if (game.score.score !== expectedScore) {
+            // The score should go up by one for each time a soft drop is performed
+            if (game.score.score !== 1) {
                 throw new Error("A soft drop should score 1 point per cell descended");
             }
         }
